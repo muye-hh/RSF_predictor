@@ -1,0 +1,1 @@
+install.packages(c("shiny", "survival", "ranger"), repos = "https://cran.rstudio.com/")
