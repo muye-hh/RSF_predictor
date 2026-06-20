@@ -1,0 +1,5 @@
+#!/bin/bash
+# 该脚本在 Binder 构建完成后执行，将默认启动命令改为 Shiny Server
+echo "Starting Shiny Server..." > /tmp/start.sh
+echo "exec /usr/bin/shiny-server" >> /tmp/start.sh
+chmod +x /tmp/start.sh
