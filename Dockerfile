@@ -1,25 +1,23 @@
 FROM rocker/shiny:latest
 
-# 安装系统依赖（ranger 可能需要编译工具）
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libcurl4-openssl-dev \
-    libssl-dev \
+# 安装系统依赖
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libcurl4-openssl-dev libssl-dev \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装 R 包
-RUN install2.r --error --skipinstalled \
-    shiny \
-    survival \
-    ranger
+RUN install2.r --error --skipinstalled shiny survival ranger
 
-# 复制全部应用文件到 Shiny Server 目录
-COPY . /srv/shiny-server/RSFpredictor/
+# 创建工作目录并复制应用文件
+RUN mkdir -p /home/shiny/app
+COPY . /home/shiny/app/
 
-# 确保文件权限正确
-RUN chmod -R 755 /srv/shiny-server/RSFpredictor/
+# 设置工作目录
+WORKDIR /home/shiny/app
 
-# 暴露端口
+# 暴露 Shiny 默认端口
 EXPOSE 3838
 
-# 启动 Shiny Server
-CMD ["/usr/bin/shiny-server"]
+# 直接启动 Shiny 应用，监听所有网络接口
+CMD ["R", "-e", "shiny::runApp('/home/shiny/app/app.R', port=3838, host='0.0.0.0')"]
